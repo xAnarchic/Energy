@@ -94,6 +94,42 @@ def excluding_midp_outliers(sorted_data, periods : list):
     return excluding_outliers_df
 
 
+def pricing_quote_variables():
+    print("What is their expected annual electricity use? (kWh)")
+    annual_use = int(input())
+    if annual_use < 100000:
+        business_class = "micro"
+    elif annual_use >= 100000 and annual_use < 200000:
+        business_class = "small"
+    elif annual_use > 500000:
+        business_class = "large"
+    else:
+        print("Please enter a valid quantity.")
+    
+    print("What is their desired rate?")
+    rate = input().lower((
+    if rate == 'fixed':
+        pass
+    elif rate == 'variable':
+        pass
+    elif rate == 'green':
+        pass
+    elif rate == 'deemed':
+        pass
+    else:
+    print("Please enter a valid rate.")
+    
+    print("What is their credit score?")
+    credit = int(input())
+    if credit > 80:
+        risk = "low"
+    elif credit <80 and credit >= 40:
+        risk = "medium"
+    elif credit < 40:
+        risk = "high"
+    
+    #Use multipliers depending on each variable
+
 
 if __name__ == "__main__":
     print("Updating database or analysing?")

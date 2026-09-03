@@ -52,9 +52,9 @@ class SQLConnection:
         self.connection.commit()
 
 
-def preparing_data():
+def prep_data(url):
 
-    df = dataframe_evaluation(midp_api_call())
+    df = dataframe_evaluation(midp_api_call(url))
     data = excluding_midp_outliers(df, settlement_periods())
 
     #Converting dataframe into a list of tuples
@@ -66,7 +66,8 @@ def preparing_data():
 
 if __name__ == "__main__":
 
-    prepped_data = preparing_data()
+    initial_api_url = "https://data.elexon.co.uk/bmrs/api/v1//balancing/pricing/market-index?from=2026-08-25T00:00Z&to=2026-08-30T00:00Z&settlementPeriodTo=1&dataProviders=APXMIDP"
+    prepped_data = prep_data(initial_api_url)
     obj = SQLConnection(prepped_data)
-    obj.table_creation()
-    obj.data_input()    #Only call this once initially
+    obj.table_creation()    #Only call this once initially
+    obj.data_input()

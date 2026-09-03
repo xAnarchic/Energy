@@ -4,17 +4,19 @@ import pandas as pd
 import numpy as np
 import statistics
 import sys
+import datetime
+from data_for_vis import prep_data, SQLConnection
 
-from selenium.webdriver.support.expected_conditions import visibility_of_all_elements_located
 
 
 #function requests historical market index price data - would use futures for a real pricing quote
 @_recorder.record(file_path="..\\Tests\\Integration\\Fixtures\\fixture.yaml")
-def midp_api_call():
+def midp_api_call(url):
 
     api_response = requests.get(
-        url = 'https://data.elexon.co.uk/bmrs/api/v1/balancing/pricing/market-index?from=2026-08-25T23%3A00Z&to=2026-08-30T23%3A00Z&settlementPeriodFrom=1&settlementPeriodTo=50&dataProviders=APXMIDP&format=json'
+        url = url
     )
+
     data = api_response.json()["data"]
     return data
 
@@ -97,9 +99,25 @@ if __name__ == "__main__":
     print("Updating database or analysing?")
     resp = input().lower()
     if resp == "updating":
-        #td: get current month, day and time in addition to the previous day
-        #td: insert into api url constructor + use to make api call instead
+        #Gets current settlement period and as far back a period as the API will allow (a week)
+        curr_date = datetime.datetime.now().replace(microsecond = 0, second = 0)
+        print(curr_date.minute)
+        if curr_date.minute < 30:
+            curr_date = curr_date.replace(minute = 00)
+        else:
+            curr_date = curr_date.replace(minute = 30)
+        prev_date = (curr_date - datetime.timedelta(days = 7)).replace(microsecond = 0)
 
+        #Constructing API url
+        from_date = datetime.datetime.strftime(curr_date, "%Y-%m-%dT%H:%MZ")
+        to_date = prev_date.strftime("%Y-%m-%dT%H:%MZ")
+
+        api_url_constructor = f"https://data.elexon.co.uk/bmrs/api/v1//balancing/pricing/market-index?from={from_date}&to={to_date}&settlementPeriodTo=1&dataProviders=APXMIDP&format=json"
+
+        prepped_data = prep_data(api_url_constructor)
+
+        obj = SQLConnection(prepped_data)
+        obj.data_input()
 
         pass
     elif resp == "analysing":

@@ -1,4 +1,3 @@
-from Market_index_price import midp_api_call, dataframe_evaluation, settlement_periods, excluding_midp_outliers
 import os
 from dotenv import load_dotenv
 import mysql.connector as connector
@@ -52,10 +51,7 @@ class SQLConnection:
         self.connection.commit()
 
 
-def prep_data(url):
-
-    df = dataframe_evaluation(midp_api_call(url))
-    data = excluding_midp_outliers(df, settlement_periods())
+def prep_data(data):
 
     #Converting dataframe into a list of tuples
     prepared_data = ([tuple(x) for x in data.itertuples(index = False)])
@@ -65,9 +61,4 @@ def prep_data(url):
 
 
 if __name__ == "__main__":
-
-    initial_api_url = "https://data.elexon.co.uk/bmrs/api/v1//balancing/pricing/market-index?from=2026-08-25T00:00Z&to=2026-08-30T00:00Z&settlementPeriodTo=1&dataProviders=APXMIDP"
-    prepped_data = prep_data(initial_api_url)
-    obj = SQLConnection(prepped_data)
-    obj.table_creation()    #Only call this once initially
-    obj.data_input()
+    pass
